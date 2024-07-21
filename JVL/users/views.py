@@ -15,10 +15,12 @@ def profile(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+    
     elif request.method == 'GET':
         objs = Profile.objects.all()
         serializer = ProfileSerializer(objs ,many = True)
         return Response(serializer.data)
+    
     elif request.method == 'PATCH':
         data = request.data
         obj = Profile.objects.get(id = data['id'])
@@ -27,6 +29,7 @@ def profile(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+    
     elif request.method == 'PUT':
         data = request.data
         print(data)
@@ -36,6 +39,7 @@ def profile(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+    
     else:
         data = request.data
         obj = Profile.objects.get(id = data['id'])
