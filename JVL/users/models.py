@@ -2,7 +2,7 @@ from django.db import models
 
 # Profile model
 class Profile(models.Model):
-    custom_id = models.CharField(max_length=20, unique=True, blank=True)
+    custom_id = models.CharField(max_length=20, unique=True, blank=True,null=True)
     name = models.CharField(max_length=30)
     mobile_no = models.CharField(max_length=13)
     email = models.EmailField(max_length=30, null=True, blank=True)
@@ -147,12 +147,10 @@ class AddToCart(models.Model):
         return self.profile.name
     
 # Whishlist model
-class WishList(models.Mode):
+class WishList(models.Model):
     profile = models.ForeignKey(Profile,on_delete=models.CASCADE)
     product_cart = models.ForeignKey(Product,on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.profile.name
-
-
-
+    
