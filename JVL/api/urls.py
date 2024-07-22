@@ -11,6 +11,6 @@ urlpatterns = [
     path('order/',order,name='order'),
     path('addtocart/',addtocart,name='addtocart'),
     path('wishList/',wishList,name='wishList'),
-    path('review/',review,name='review'),
+    # path('review/',review,name='review'),
     path('requests/',requests,name='requests'),
 ]

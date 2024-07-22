@@ -1,5 +1,6 @@
 from django.db import models
-from users.models import *
+# from users.models import Consumer
+from users.models import*
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -32,6 +33,7 @@ class Request(models.Model):
 
 @receiver(post_save, sender=Request)
 def create_consumer(sender, instance, created, **kwargs):
+    from users.models import Consumer
     if instance.is_accepted and not Consumer.objects.filter(consumer_name=instance.consumer_name).exists():
         Consumer.objects.create(
             consumer_name=instance.consumer_name,
