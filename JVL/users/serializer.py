@@ -1,7 +1,16 @@
 from rest_framework import serializers
 from .models import *
 
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+
 class ProfileSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(many=True, read_only=True)
+    rating = serializers.ReadOnlyField()
+    num_reviews = serializers.ReadOnlyField()
     class Meta:
         model = Profile
         fields = '__all__'
@@ -52,3 +61,4 @@ class WishListSerializer(serializers.ModelSerializer):
         model = WishList
         fields = '__all__'
         depth = 1
+

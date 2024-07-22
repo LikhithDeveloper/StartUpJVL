@@ -320,3 +320,58 @@ def wishList(request):
             return Response(serializer.data)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+@api_view(['POST', 'GET', 'PUT', 'PATCH', 'DELETE'])
+def review(request):
+    if request.method == 'POST':
+        data = request.data
+        serializer = ReviewSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'GET':
+        reviews = Review.objects.all()
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'PATCH':
+        data = request.data
+        try:
+            review = Review.objects.get(id=data['id'])
+        except Review.DoesNotExist:
+            return Response({'error': 'Review not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ReviewSerializer(review, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PUT':
+        data = request.data
+        try:
+            review = Review.objects.get(id=data['id'])
+        except Review.DoesNotExist:
+            return Response({'error': 'Review not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ReviewSerializer(review, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        data = request.data
+        try:
+            review = Review.objects.get(id=data['id'])
+        except Review.DoesNotExist:
+            return Response({'error': 'Review not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        review.delete()
+        return Response({'message': 'Review deleted'}, status=status.HTTP_204_NO_CONTENT)
+

@@ -88,6 +88,8 @@ class SubCategory(models.Model):
         return self.sub_cat_name
 
 # Product model
+from django.db.models import Avg
+
 class Product(models.Model):
     product_id = models.CharField(max_length=20, unique=True, blank=True)
     consumer = models.ForeignKey(Consumer, on_delete=models.CASCADE)
@@ -97,8 +99,6 @@ class Product(models.Model):
     images = models.ImageField(upload_to='images/')
     price = models.IntegerField()
     count_stock = models.IntegerField()
-    rating = models.DecimalField(max_digits=2, decimal_places=1)
-    num_reviews = models.IntegerField()
 
     def save(self, *args, **kwargs):
         if not self.product_id:
@@ -111,9 +111,33 @@ class Product(models.Model):
             self.product_id = new_id
         super().save(*args, **kwargs)
 
-    def __str__(self) -> str:
+    @property
+    def rating(self):
+        reviews = self.reviews.all()
+        if reviews.exists():
+            return reviews.aggregate(Avg('rating'))['rating__avg']
+        return 0.0
+
+    @property
+    def num_reviews(self):
+        return self.reviews.count()
+
+    def __str__(self):
         return self.product_name
+
     
+# review and rating
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    consumer = models.ForeignKey(Consumer, on_delete=models.CASCADE)
+    rating = models.DecimalField(max_digits=2, decimal_places=1)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Review for {self.product.product_name} by {self.consumer}'
+
 
 
 # Order model
