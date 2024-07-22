@@ -43,6 +43,30 @@ class Category(models.Model):
 
     def __str__(self) -> str:
         return self.category_name
+    
+
+# SubCategory model
+class SubCategory(models.Model):
+    sub_cat_id = models.CharField(max_length=20, unique=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    sub_cat_name = models.CharField(max_length=50)
+    sub_cat_description = models.TextField()
+
+    def save(self, *args, **kwargs):
+        if not self.sub_cat_id:
+            last_sub_cat = SubCategory.objects.all().order_by('id').last()
+            if last_sub_cat:
+                last_id = int(last_sub_cat.sub_cat_id.replace('SUB_CAT', ''))
+                new_id = f'SUB_CAT{last_id + 1:02d}'
+            else:
+                new_id = 'SUB_CAT01'
+            self.sub_cat_id = new_id
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return self.sub_cat_name
+    
+
 
 # Consumer model
 class Consumer(models.Model):
@@ -66,26 +90,6 @@ class Consumer(models.Model):
     def __str__(self) -> str:
         return self.consumer_name
 
-# SubCategory model
-class SubCategory(models.Model):
-    sub_cat_id = models.CharField(max_length=20, unique=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    sub_cat_name = models.CharField(max_length=50)
-    sub_cat_description = models.TextField()
-
-    def save(self, *args, **kwargs):
-        if not self.sub_cat_id:
-            last_sub_cat = SubCategory.objects.all().order_by('id').last()
-            if last_sub_cat:
-                last_id = int(last_sub_cat.sub_cat_id.replace('SUB_CAT', ''))
-                new_id = f'SUB_CAT{last_id + 1:02d}'
-            else:
-                new_id = 'SUB_CAT01'
-            self.sub_cat_id = new_id
-        super().save(*args, **kwargs)
-
-    def __str__(self) -> str:
-        return self.sub_cat_name
 
 # Product model
 from django.db.models import Avg
@@ -142,7 +146,7 @@ class Review(models.Model):
 
 # Order model
 class Order(models.Model):
-    order_id = models.CharField(max_length=20, unique=True)
+    order_id = models.CharField(max_length=20, unique=True,blank=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
