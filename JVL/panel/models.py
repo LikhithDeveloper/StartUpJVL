@@ -9,8 +9,8 @@ class Request(models.Model):
     request_id = models.CharField(max_length=20, unique=True, blank=True)
     consumer_name = models.CharField(max_length=50)
     consumer_number = models.CharField(max_length=12)
-    email = models.EmailField()
-    brand_name = models.CharField(max_length=50)
+    email = models.EmailField(unique=True)
+    brand_name = models.CharField(max_length=50,unique=True)
     is_accepted = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
@@ -39,3 +39,46 @@ def create_consumer(sender, instance, created, **kwargs):
             email=instance.email,
             brand_name=instance.brand_name
         )
+
+
+# Category model
+class Category(models.Model):
+    category_id = models.CharField(max_length=20, unique=True, blank=True)
+    category_name = models.CharField(max_length=50,unique=True)
+    category_description = models.TextField()
+
+    def save(self, *args, **kwargs):
+        if not self.category_id:
+            last_category = Category.objects.all().order_by('id').last()
+            if last_category:
+                last_id = int(last_category.category_id.replace('CATEGORY', ''))
+                new_id = f'CATEGORY{last_id + 1:02d}'
+            else:
+                new_id = 'CATEGORY01'
+            self.category_id = new_id
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return self.category_name
+    
+
+# SubCategory model
+class SubCategory(models.Model):
+    sub_cat_id = models.CharField(max_length=20, unique=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    sub_cat_name = models.CharField(max_length=50,unique=True)
+    sub_cat_description = models.TextField()
+
+    def save(self, *args, **kwargs):
+        if not self.sub_cat_id:
+            last_sub_cat = SubCategory.objects.all().order_by('id').last()
+            if last_sub_cat:
+                last_id = int(last_sub_cat.sub_cat_id.replace('SUB_CAT', ''))
+                new_id = f'SUB_CAT{last_id + 1:02d}'
+            else:
+                new_id = 'SUB_CAT01'
+            self.sub_cat_id = new_id
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return self.sub_cat_name
