@@ -99,18 +99,18 @@ def profile(request):
 
 
 # consumer api
-@api_view(['POST','GET','PUT','PATCH','DELETE'])
+@api_view(['GET','PUT','PATCH','DELETE'])
 def consumer(request):
     try:
-        if request.method == 'POST':
-            data = request.data
-            serializer = ConsumerSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # if request.method == 'POST':
+        #     data = request.data
+        #     serializer = ConsumerSerializer(data=data)
+        #     if serializer.is_valid():
+        #         serializer.save()
+        #         return Response(serializer.data)
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        elif request.method == 'GET':
+        if request.method == 'GET':
             objs = Consumer.objects.all()
             serializer = ConsumerSerializer(objs, many=True)
             return Response(serializer.data)

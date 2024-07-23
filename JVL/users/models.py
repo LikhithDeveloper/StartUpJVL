@@ -1,5 +1,7 @@
 from django.db import models
-from panel.models import Request,Category,SubCategory
+from panel.models import Request,Category,SubCategory,ConsumerPanel
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Profile model
 class Profile(models.Model):
@@ -116,16 +118,16 @@ class Product(models.Model):
             self.product_id = new_id
         super().save(*args, **kwargs)
 
-    @property
-    def rating(self):
-        reviews = self.reviews.all()
-        if reviews.exists():
-            return reviews.aggregate(Avg('rating'))['rating__avg']
-        return 0.0
+    # @property
+    # def rating(self):
+    #     reviews = self.reviews.all()
+    #     if reviews.exists():
+    #         return reviews.aggregate(Avg('rating'))['rating__avg']
+    #     return 0.0
 
-    @property
-    def num_reviews(self):
-        return self.reviews.count()
+    # @property
+    # def num_reviews(self):
+    #     return self.reviews.count()
 
     def __str__(self):
         return self.product_name
@@ -150,7 +152,6 @@ class Order(models.Model):
     order_id = models.CharField(max_length=20, unique=True,blank=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
         if not self.order_id:
@@ -165,7 +166,21 @@ class Order(models.Model):
 
     def __str__(self):
         return self.order_id
-    
+
+@receiver(post_save, sender=Order)
+def create_consumerPanel(sender, instance, created, **kwargs):
+    from users.models import ConsumerPanel
+    if created:
+        ConsumerPanel.objects.create(
+            consumer = instance.product.consumer,
+            order_id=instance.order_id,
+            product_id=instance.product.product_id,
+            product_name=instance.product.product_name,
+            coustemer_name=instance.profile.name,  
+            coustomer_mobile_number=instance.profile.mobile_no,  
+            coustemer_email=instance.profile.email,  
+            coustomer_address=instance.profile.address  
+        )
 
 # AddToCart model
 class AddToCart(models.Model):
