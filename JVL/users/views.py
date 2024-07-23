@@ -283,7 +283,7 @@ def order(request):
 
 
 # addtocart api
-@api_view(['POST','GET'])
+@api_view(['POST','GET','DELETE'])
 def addtocart(request):
     try:
         if request.method == 'POST':
@@ -298,12 +298,27 @@ def addtocart(request):
             objs = AddToCart.objects.all()
             serializer = AddToCartSerializer(objs, many=True)
             return Response(serializer.data)
+        # elif request.method == 'DELETE':
+        #     data = request.data
+        #     obj = AddToCart.objects.get(id = data[id])
+        #     obj.delete()
+        #     return Response({'message':'removed from Cart'})
+        elif request.method == 'DELETE':
+            data = request.data
+            # Use 'id' as the key to access the value
+            obj_id = data.get('id')
+            if obj_id is not None:
+                obj = AddToCart.objects.get(id=data['id'])
+                obj.delete()
+                return Response({'message': 'removed from Cart'})
+            else:
+                return Response({'error': 'ID not provided'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # wishlist api
-@api_view(['POST','GET'])
+@api_view(['POST','GET','DELETE'])
 def wishList(request):
     try:
         if request.method == 'POST':
@@ -318,6 +333,16 @@ def wishList(request):
             objs = WishList.objects.all()
             serializer = WishListSerializer(objs, many=True)
             return Response(serializer.data)
+        elif request.method == 'DELETE':
+            data = request.data
+            # Use 'id' as the key to access the value
+            obj_id = data.get('id')
+            if obj_id is not None:
+                obj = WishList.objects.get(id=data['id'])
+                obj.delete()
+                return Response({'message': 'removed from wishlist'})
+            else:
+                return Response({'error': 'ID not provided'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
