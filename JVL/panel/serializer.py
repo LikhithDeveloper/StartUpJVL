@@ -25,4 +25,11 @@ class SubCategorySerializer(serializers.ModelSerializer):
         model = SubCategory
         fields = '__all__'
         depth = 1
-    
+
+
+class ConsumerPanelSerializer(serializers.ModelSerializer):
+    consumer = serializers.PrimaryKeyRelatedField(queryset=Consumer.objects.all()) 
+    class Meta:
+        model = ConsumerPanel
+        fields = '__all__'
+        depth = 1

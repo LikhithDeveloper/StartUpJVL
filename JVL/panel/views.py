@@ -144,3 +144,34 @@ def subcategory(request):
         return Response({'error': 'SubCategory not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@api_view(['GET', 'DELETE', 'PATCH'])
+def consumerpanel(request):
+    if request.method == 'GET':
+        objs = ConsumerPanel.objects.all()
+        serializer = ConsumerPanelSerializer(objs, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'PATCH':
+        data = request.data
+        try:
+            obj = ConsumerPanel.objects.get(id=data['id'])
+        except ObjectDoesNotExist:
+            return Response({'error': 'ConsumerPanel not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = ConsumerPanelSerializer(obj, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        data = request.data
+        try:
+            obj = ConsumerPanel.objects.get(id=data['id'])
+        except ObjectDoesNotExist:
+            return Response({'error': 'ConsumerPanel not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        obj.delete()
+        return Response({'message': 'ConsumerPanel deleted'}, status=status.HTTP_204_NO_CONTENT)

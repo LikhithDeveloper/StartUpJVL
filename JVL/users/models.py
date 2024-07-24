@@ -103,7 +103,7 @@ class Product(models.Model):
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=100)
     description = models.TextField()
-    images = models.ImageField(upload_to='images/')
+    images = models.ImageField(upload_to='images/',null=True,blank=True)
     price = models.IntegerField()
     count_stock = models.IntegerField()
 

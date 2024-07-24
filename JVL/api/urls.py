@@ -13,4 +13,5 @@ urlpatterns = [
     path('wishList/',wishList,name='wishList'),
     # path('review/',review,name='review'),
     path('requests/',requests,name='requests'),
+    path('consumerpanel/',consumerpanel,name='consumerpanel'),
 ]
