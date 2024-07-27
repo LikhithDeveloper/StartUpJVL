@@ -55,13 +55,13 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
-    def get_images(self, obj):
-        request = self.context.get('request')
-        if request and obj.images:
-            # Debug: Print the URL to check
-            print("Image URL:", obj.images.url)
-            return request.build_absolute_uri(obj.images.url)
-        return None
+    # def get_images(self, obj):
+    #     request = self.context.get('request')
+    #     if request and obj.images:
+    #         # Debug: Print the URL to check
+    #         print("Image URL:", obj.images.url)
+    #         return request.build_absolute_uri(obj.images.url)
+    #     return None
 
 
 class OrderSerializer(serializers.ModelSerializer):

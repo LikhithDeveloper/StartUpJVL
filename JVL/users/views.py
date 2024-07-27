@@ -109,50 +109,66 @@ def consumer(request):
 
 
 # product api
-@api_view(['POST', 'GET', 'PUT', 'PATCH', 'DELETE'])
-def product(request):
-    try:
-        if request.method == 'POST':
-            data = request.data
-            data['product_name'] = data.get('product_name', '').lower()
-            serializer = ProductSerializer(data=data, context={'request': request})
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# @api_view(['POST', 'GET', 'PUT', 'PATCH', 'DELETE'])
+# def product(request):
+#     try:
+#         if request.method == 'POST':
+#             data = request.data
+#             data['product_name'] = data.get('product_name', '').lower()
+#             serializer = ProductSerializer(data=data, context={'request': request})
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        elif request.method == 'GET':
-            objs = Product.objects.all()
-            serializer = ProductSerializer(objs, many=True, context={'request': request})
-            return Response(serializer.data)
+#         elif request.method == 'GET':
+#             objs = Product.objects.all()
+#             serializer = ProductSerializer(objs, many=True, context={'request': request})
+#             return Response(serializer.data)
 
-        elif request.method == 'PATCH':
-            data = request.data
-            obj = Product.objects.get(id=data['id'])
-            serializer = ProductSerializer(obj, data=data, partial=True, context={'request': request})
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         elif request.method == 'PATCH':
+#             data = request.data
+#             obj = Product.objects.get(id=data['id'])
+#             serializer = ProductSerializer(obj, data=data, partial=True, context={'request': request})
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        elif request.method == 'PUT':
-            data = request.data
-            obj = Product.objects.get(id=data['id'])
-            serializer = ProductSerializer(obj, data=data, context={'request': request})
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         elif request.method == 'PUT':
+#             data = request.data
+#             obj = Product.objects.get(id=data['id'])
+#             serializer = ProductSerializer(obj, data=data, context={'request': request})
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        elif request.method == 'DELETE':
-            data = request.data
-            obj = Product.objects.get(id=data['id'])
-            obj.delete()
-            return Response({'message': 'Product deleted'})
-    except Product.DoesNotExist:
-        return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         elif request.method == 'DELETE':
+#             data = request.data
+#             obj = Product.objects.get(id=data['id'])
+#             obj.delete()
+#             return Response({'message': 'Product deleted'})
+#     except Product.DoesNotExist:
+#         return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+#     except Exception as e:
+#         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+from rest_framework import generics
+
+class ProductListCreateView(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def perform_create(self, serializer):
+        # Optionally, modify data before saving
+        data = self.request.data
+        data['product_name'] = data.get('product_name', '').lower()
+        serializer.save()
+
+class ProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 # orders api
 @api_view(['POST','GET','PUT','PATCH','DELETE'])
