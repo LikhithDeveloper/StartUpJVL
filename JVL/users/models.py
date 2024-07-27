@@ -6,7 +6,7 @@ from django.dispatch import receiver
 # Profile model
 class Profile(models.Model):
     custom_id = models.CharField(max_length=20, unique=True, blank=True,null=True)
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30,null=True,blank=True)
     mobile_no = models.CharField(max_length=13,unique=True)
     email = models.EmailField(max_length=30, null=True, blank=True,unique=True)
     address = models.TextField(null=True, blank=True)
