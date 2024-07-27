@@ -1,12 +1,11 @@
 from rest_framework import serializers
 from .models import *
 
-# class ReviewSerializer(serializers.ModelSerializer):
-#     product = serializers.PrimaryKeyRelatedField(queryset = Product.objects.all())
-#     consumer = serializers.PrimaryKeyRelatedField(queryset = Consumer.objects.all())
-#     class Meta:
-#         model = Review
-#         fields = '__all__'
+class ReviewSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset = Product.objects.all())
+    class Meta:
+        model = Review
+        fields = '__all__'
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -44,16 +43,25 @@ class ConsumerSerializer(serializers.ModelSerializer):
     
 
 
+
+
 class ProductSerializer(serializers.ModelSerializer):
-    consumer = serializers.PrimaryKeyRelatedField(queryset = Consumer.objects.all())
+    consumer = serializers.PrimaryKeyRelatedField(queryset=Consumer.objects.all())
     sub_category = serializers.PrimaryKeyRelatedField(queryset=SubCategory.objects.all())
-    # consumer = serializers.SlugRelatedField(slug_field='consumer_id',queryset = Consumer.objects.all())
-    # sub_category = serializers.SlugRelatedField(slug_field='sub_cat_id',queryset = SubCategory.objects.all())
+    # images = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = '__all__'
         depth = 1
+
+    def get_images(self, obj):
+        request = self.context.get('request')
+        if request and obj.images:
+            # Debug: Print the URL to check
+            print("Image URL:", obj.images.url)
+            return request.build_absolute_uri(obj.images.url)
+        return None
 
 
 class OrderSerializer(serializers.ModelSerializer):

@@ -4,7 +4,11 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from .models import *
 from .serializer import *
+import vonage
+import random
 
+def otp(number):
+    pass
 
 # profiles apis
 @api_view(['POST','GET','PUT','PATCH','DELETE'])
@@ -105,14 +109,13 @@ def consumer(request):
 
 
 # product api
-@api_view(['POST','GET','PUT','PATCH','DELETE'])
+@api_view(['POST', 'GET', 'PUT', 'PATCH', 'DELETE'])
 def product(request):
     try:
         if request.method == 'POST':
             data = request.data
-            print(data)
-            data['product_name'] = data.get('product_name','').lower()
-            serializer = ProductSerializer(data=data)
+            data['product_name'] = data.get('product_name', '').lower()
+            serializer = ProductSerializer(data=data, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
@@ -120,13 +123,13 @@ def product(request):
 
         elif request.method == 'GET':
             objs = Product.objects.all()
-            serializer = ProductSerializer(objs, many=True)
+            serializer = ProductSerializer(objs, many=True, context={'request': request})
             return Response(serializer.data)
 
         elif request.method == 'PATCH':
             data = request.data
             obj = Product.objects.get(id=data['id'])
-            serializer = ProductSerializer(obj, data=data, partial=True)
+            serializer = ProductSerializer(obj, data=data, partial=True, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
@@ -135,7 +138,7 @@ def product(request):
         elif request.method == 'PUT':
             data = request.data
             obj = Product.objects.get(id=data['id'])
-            serializer = ProductSerializer(obj, data=data)
+            serializer = ProductSerializer(obj, data=data, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
@@ -150,7 +153,6 @@ def product(request):
         return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 # orders api
 @api_view(['POST','GET','PUT','PATCH','DELETE'])
@@ -261,6 +263,40 @@ def wishList(request):
                 return Response({'error': 'ID not provided'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+# reviews api
+
+@api_view(['POST','GET','PATCH','DELETE'])
+
+def review(request):
+    if request.method == 'POST':
+        data = request.data
+        serializer = ReviewSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    elif request.method == 'GET':
+        objs = Review.objects.all()
+        serializer = ReviewSerializer(objs,many = True)
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        data = request.data
+        obj = Review.objects.get(id = data['id'])
+        obj.delete()
+        return Response({'message' : 'Review is deleted'})
+    
+    else:
+        data = request.data
+        obj = Order.objects.get(id=data['id'])
+        serializer = OrderSerializer(obj, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 

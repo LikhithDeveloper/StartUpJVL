@@ -25,6 +25,9 @@ class Profile(models.Model):
     def __str__(self) -> str:
         return self.name
 
+class OTP(models.Model):
+    profile = models.OneToOneField(Profile,on_delete=models.CASCADE)
+    otp = models.CharField(max_length=4,null=True,blank=True)
 
 
 
@@ -60,7 +63,7 @@ class Product(models.Model):
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=100)
     description = models.TextField()
-    images = models.ImageField(upload_to='images/',null=True,blank=True)
+    images = models.ImageField(upload_to='products/images/',null=True,blank=True)
     price = models.IntegerField()
     count_stock = models.IntegerField()
 
@@ -74,6 +77,8 @@ class Product(models.Model):
                 new_id = 'PRODUCT01'
             self.product_id = new_id
         super().save(*args, **kwargs)
+
+    
 
     # @property
     # def rating(self):
@@ -92,17 +97,13 @@ class Product(models.Model):
     
 # review and rating
 
-# class Review(models.Model):
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-#     consumer = models.ForeignKey(Consumer, on_delete=models.CASCADE)
-#     rating = models.DecimalField(max_digits=2, decimal_places=1)
-#     comment = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f'Review for {self.product.product_name} by {self.consumer}'
-
-
+class Review(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    rating = models.DecimalField(max_digits=2 , decimal_places=1)
+    review = models.TextField(null=True,blank=True)
+    
+    def __str__(self) -> str:
+        return self.product.product_name
 
 # Order model
 class Order(models.Model):
